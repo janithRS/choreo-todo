@@ -16,11 +16,10 @@ public type Item record {|
     string content;
 |};
 
-final mysql:Client dbClient = check new (
+isolated function getList() returns Item[]|error {
+    final mysql:Client dbClient = check new (
     host = HOST, user = USER, password = PASSWORD, port = PORT, database = DATABASE
 );
-
-isolated function getList() returns Item[]|error {
     Item[] itemList = [];
     stream<Item, error?> itemStream = dbClient->query(
         `SELECT * FROM todo_list`
@@ -30,12 +29,17 @@ isolated function getList() returns Item[]|error {
             itemList.push(item);
         };
     check itemStream.close();
+    check dbClient.close();
     return itemList;
 }
 
 isolated function addItem(Item item) returns int|error {
+    final mysql:Client dbClient = check new (
+    host = HOST, user = USER, password = PASSWORD, port = PORT, database = DATABASE
+);
     sql:ExecutionResult result = check dbClient->execute(`INSERT INTO todo_list(id, content) VALUES (${item.id}, ${item.content})`);
     int|string? lastInsertId = result.lastInsertId;
+    check dbClient.close();
     if lastInsertId is int {
         return lastInsertId;
     } else {
