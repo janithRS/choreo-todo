@@ -1,7 +1,27 @@
 import ballerina/http;
+import ballerinax/mysql.driver as _;
+import ballerinax/mysql;
+
+// import ballerina/sql;
 
 # A service representing a network-accessible API
 # bound to port `9090`.
+
+configurable string USER = ?;
+configurable string PASSWORD = ?;
+configurable string HOST = ?;
+configurable int PORT = ?;
+configurable string DATABASE = ?;
+
+public type Item record {|
+    int id;
+    string content;
+|};
+
+final mysql:Client dbClient = check new (
+    host = HOST, user = USER, password = PASSWORD, port = PORT, database = DATABASE
+);
+
 service / on new http:Listener(9090) {
 
     # A resource for generating greetings
