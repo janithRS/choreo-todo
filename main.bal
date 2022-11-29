@@ -17,9 +17,7 @@ public type Item record {|
 |};
 
 isolated function getList() returns Item[]|error {
-    final mysql:Client dbClient = check new (
-    host = HOST, user = USER, password = PASSWORD, port = PORT, database = DATABASE
-);
+    final mysql:Client dbClient = check new (host = HOST, user = USER, password = PASSWORD, port = PORT, database = DATABASE);
     Item[] itemList = [];
     stream<Item, error?> itemStream = dbClient->query(
         `SELECT * FROM todo_list`
@@ -34,9 +32,7 @@ isolated function getList() returns Item[]|error {
 }
 
 isolated function addItem(Item item) returns int|error {
-    final mysql:Client dbClient = check new (
-    host = HOST, user = USER, password = PASSWORD, port = PORT, database = DATABASE
-);
+    final mysql:Client dbClient = check new (host = HOST, user = USER, password = PASSWORD, port = PORT, database = DATABASE);
     sql:ExecutionResult result = check dbClient->execute(`INSERT INTO todo_list(id, content) VALUES (${item.id}, ${item.content})`);
     int|string? lastInsertId = result.lastInsertId;
     check dbClient.close();
